@@ -14,12 +14,11 @@ function calc(addHours = 0) {
     now = new moment().add(addHours, 'hours');
 
     const times = SunCalc.getTimes(now, latitude, longitude);
-    
+
     const sunrise = times.sunriseEnd;
     const sunset = times.sunsetStart;
 
     return {
-        ...times,
         timezone: timeZone,
         now: format(now),
         nowUnix: Number(now),
