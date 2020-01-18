@@ -1,9 +1,15 @@
 #!/usr/bin/env node
 
 /**
+ * Enviroment config
+ */
+var dotenv = require('dotenv');
+dotenv.config();
+
+
+/**
  * Module dependencies.
  */
-
 var app = require('../app');
 var debug = require('debug')('node-server:server');
 var http = require('http');
