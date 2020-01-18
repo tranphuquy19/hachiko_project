@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var webPush = require('web-push');
+var i18n = require('i18n');
 
 const { server } = require('./configs');
 
@@ -21,6 +22,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// i18n config
+i18n.configure({
+  locales: ['vi', 'en'],
+  defaultLocale: 'vi',
+  queryParameter: 'lang',
+  directory: path.join(__dirname, 'public', 'langs'),
+  cookie: 'lang'
+});
+app.use(i18n.init);
 
 //config web push
 webPush.setVapidDetails(`mailto:${server.email}`, server.pubVapidKey, server.priVapidKey);
