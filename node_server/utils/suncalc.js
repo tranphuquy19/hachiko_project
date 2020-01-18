@@ -10,8 +10,7 @@ function format(times) {
 function calc(addHours = 0) {
     const {latitude, longitude, timeZone} = homeConfig;
 
-    var now = new moment();
-    now = new moment().add(addHours, 'hours');
+    var now = new moment().add(addHours, 'hours');
 
     const times = SunCalc.getTimes(now, latitude, longitude);
 
