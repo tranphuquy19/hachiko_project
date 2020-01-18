@@ -1,7 +1,9 @@
 {
-    "home": "Trang chủ",
-    "about": "Chi tiết",
-    "contact": "Liên hệ",
-    "toggleSidebar": "Đóng/mở menu",
-    "docs": "Hướng dẫn"
+	"home": "Trang chủ",
+	"about": "Chi tiết",
+	"contact": "Liên hệ",
+	"toggleSidebar": "Đóng/mở menu",
+	"docs": "Hướng dẫn",
+	"fbContact": "@tranphuquy19",
+	"page": "Trang"
 }
