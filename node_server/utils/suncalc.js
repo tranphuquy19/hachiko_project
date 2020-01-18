@@ -1,4 +1,4 @@
-var {homeConfig} = require('../configs');
+var { homeConfig } = require('../configs');
 var SunCalc = require('suncalc');
 var moment = require('moment');
 var momentTz = require('moment-timezone');
@@ -8,7 +8,7 @@ function format(times) {
 }
 
 function calc(addHours = 0) {
-    const {latitude, longitude, timeZone} = homeConfig;
+    const { latitude, longitude, timeZone } = homeConfig;
 
     var now = new moment().add(addHours, 'hours');
 

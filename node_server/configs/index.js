@@ -1,7 +1,10 @@
 module.exports = {
     server: {
         domain: process.env.SERVER_DOMAIN,
-        mcuRoute: process.env.MCU_ROUTE
+        mcuRoute: process.env.MCU_ROUTE,
+        email: process.env.EMAIL,
+        pubVapidKey: process.env.PUBLIC_VAPID_KEY,
+        priVapidKey: process.env.PRIVATE_VAPID_KEY
     },
 
     mongoDb: {

@@ -9,8 +9,8 @@ router.get('/', function (req, res, next) {
 });
 
 router.get(`/${config.server.mcuRoute}`, (req, res, next) => {
- if(sunCalc().isNight) res.status(200).send('0');
- else res.status(200).send('1');
+  if (sunCalc().isNight) res.status(200).send('0');
+  else res.status(200).send('1');
 });
 
 router.get('/suncalc', (req, res, next) => {
