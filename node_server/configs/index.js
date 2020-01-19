@@ -15,7 +15,7 @@ module.exports = {
     },
 
     homeConfig: {
-        timeZone: process.env.TIME_ZONE,
+        timezone: process.env.TIMEZONE,
         timeFormat: process.env.TIME_FORMAT,
         longitude: process.env.LONGITUDE,
         latitude: process.env.LATITUDE

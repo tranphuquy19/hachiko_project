@@ -3,22 +3,23 @@ var SunCalc = require('suncalc');
 var moment = require('moment');
 var momentTz = require('moment-timezone');
 
+const { latitude, longitude, timezone, timeFormat } = homeConfig;
+
 function format(times) {
-    return `${momentTz.tz(times, `${homeConfig.timeZone}`).format(`${homeConfig.timeFormat}`)}`
+    return `${momentTz.tz(times, `${timezone}`).format(`${timeFormat}`)}`
 }
 
 function calc(addHours = 0) {
-    const { latitude, longitude, timeZone } = homeConfig;
-
     var now = new moment().add(addHours, 'hours');
 
     const times = SunCalc.getTimes(now, latitude, longitude);
-
     const sunrise = times.sunriseEnd;
     const sunset = times.sunsetStart;
 
     return {
-        timezone: timeZone,
+        timezone,
+        latitude,
+        longitude,
         now: format(now),
         nowUnix: Number(now),
         currentDaySunriseFormat: format(sunrise),
