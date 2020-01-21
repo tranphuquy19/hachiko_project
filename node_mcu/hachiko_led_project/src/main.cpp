@@ -22,13 +22,13 @@ void setup()
   pinMode(echo, INPUT);
   pinMode(trig, OUTPUT);
   pinMode(lamp, OUTPUT);
-  // WiFi.begin(ssid, password);
+  WiFi.begin(ssid, password);
 
-  // while (WiFi.status() != WL_CONNECTED)
-  // {
-  //   delay(2500);
-  //   Serial.print("Connecting...\n");
-  // }
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(2500);
+    Serial.print("Connecting...\n");
+  }
 }
 
 int getDistance()
@@ -54,69 +54,66 @@ int getDistance()
 
 void loop()
 {
-  preValue = currentValue;
-  currentValue = getDistance();
-
-  if (preValue == 0 || defaultDistance == 0 || newDistance == 0)
+  if (WiFi.status() == WL_CONNECTED)
   {
-    preValue = currentValue;
-    defaultDistance = currentValue;
-    newDistance = currentValue;
-    return;
+    HTTPClient http;
+
+    http.begin(mcuEndpoint);
+    http.addHeader("Content-Type", "application/json");
+
+    char *testJSON = "{\"sensorData\":12}";
+    int httpCode = http.POST(testJSON);
+    String payload = http.getString();
+
+    Serial.println(payload);
+    http.end();
   }
-
-  int delta = currentValue - preValue;
-  delta = abs(delta);
-  if (delta >= epsilon && currentValue != defaultDistance)
-  {
-    Serial.print("Detected! | ");
-    Serial.print(delta);
-    Serial.print("-");
-    Serial.print(preValue);
-    Serial.print("-");
-    Serial.println(currentValue);
-  }
-
-  if (currentValue != defaultDistance)
-  {
-    if (count == 10)
-    {
-      defaultDistance = newDistance;
-      count = 0;
-      Serial.print("Changed default distance to: ");
-      Serial.println(defaultDistance);
-    }
-
-    if (newDistance != currentValue)
-    {
-      newDistance = currentValue;
-      count = 0;
-    }
-    else
-      count++;
-  }
-  delay(500);
-  // if (WiFi.status() == WL_CONNECTED)
-  // {
-  //   HTTPClient http;
-  //   http.begin(mcuEndpoint);
-  //   int httpStatusCode = http.GET();
-
-  //   if (httpStatusCode > 0)
-  //   {
-  //     String payload = http.getString();
-  //     int result = payload.toInt();
-  //     Serial.print(result);
-  //     if (0 == result)
-  //     {
-  //       Serial.print('-');
-  //       digitalWrite(lamp, HIGH);
-  //       delay(2000);
-  //       digitalWrite(lamp, LOW);
-  //     }
-  //     Serial.println(payload);
-  //   }
-  //   http.end();
-  // }
-  // delay(6000);
+  delay(2000);
 }
+
+// void loop()
+// {
+//   preValue = currentValue;
+//   currentValue = getDistance();
+
+//   if (preValue == 0 || defaultDistance == 0 || newDistance == 0)
+//   {
+//     preValue = currentValue;
+//     defaultDistance = currentValue;
+//     newDistance = currentValue;
+//     return;
+//   }
+
+//   int delta = currentValue - preValue;
+//   delta = abs(delta);
+//   if (delta >= epsilon && currentValue != defaultDistance)
+//   {
+//     Serial.print("Detected! | ");
+//     Serial.print(delta);
+//     Serial.print("-");
+//     Serial.print(preValue);
+//     Serial.print("-");
+//     Serial.println(currentValue);
+//   }
+
+//   if (currentValue != defaultDistance)
+//   {
+//     if (count == 10)
+//     {
+//       defaultDistance = newDistance;
+//       count = 0;
+//       Serial.print("Changed default distance to: ");
+//       Serial.println(defaultDistance);
+//     }
+
+//     if (newDistance != currentValue)
+//     {
+//       newDistance = currentValue;
+//       count = 0;
+//     }
+//     else
+//       count++;
+//   }
+//   delay(500);
+
+// }

@@ -13,6 +13,11 @@ router.get(`/${config.server.mcuRoute}`, (req, res, next) => {
   else res.status(200).send('1');
 });
 
+router.post(`/${config.server.mcuRoute}`, (req, res, next) => {
+  console.log(req);
+  res.status(200).send('OK');
+});
+
 router.get('/suncalc', (req, res, next) => {
   res.status(200).json(sunCalc(req.query.add));
 });
