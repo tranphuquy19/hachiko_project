@@ -123,22 +123,19 @@ void loop()
     }
     else
     {
-      if (currentValue == defaultDistance)
+      if (count == 10)
       {
-        newDistance = 0;
-        count = 0;
+        defaultDistance = newDistance;
+        count = 1;
       }
       else
-      {
-        if (count == 10)
-        {
-          defaultDistance = newDistance;
-          count = 1;
-        }
-        else
-          count++;
-      }
+        count++;
     }
+  }
+  else
+  {
+    newDistance = 0;
+    count = 0;
   }
 
 end:
