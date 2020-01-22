@@ -14,7 +14,7 @@ router.get(`/${config.server.mcuRoute}`, (req, res, next) => {
 });
 
 router.post(`/${config.server.mcuRoute}`, (req, res, next) => {
-  console.log(req);
+  console.log(req.body);
   res.status(200).send('OK');
 });
 

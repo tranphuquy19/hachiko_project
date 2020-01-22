@@ -2,38 +2,35 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 
+#define DEBUG true
+
+// <<<<<<<<<<<<<<<<<User config>>>>>>>>>>>>>>>>>
 const char *ssid = "Quy";
 const char *password = "11231123";
 const char *mcuEndpoint = "http://192.168.137.1:3000/c81700d4-39df-11ea-a137-2e728ce88125";
+const char *nodeID = "45db3f56-a5d7-4412-a122-31bed77269a3";
 
-const char trig = 4;
-const char echo = 5;
+const uint8_t trig = 4; //D2
+const uint8_t echo = 5; //D1
 
-const char lamp = 12;
-const char epsilon = 10;
+const uint8_t lamp = 12; //D6
+// <<<<<<<<<<<<<<<<<User config>>>>>>>>>>>>>>>>>
 
-int preValue = 0, currentValue = 0;
-int defaultDistance = 0, newDistance = 0, count = 0;
-
-void setup()
+struct GPIO
 {
-  Serial.begin(9600);
+  bool pinD7 = 0; // GPIO13
+  bool pinD5 = 0; // GPIO14
+  bool pinD0 = 0; // GPIO16
+};
 
-  pinMode(echo, INPUT);
-  pinMode(trig, OUTPUT);
-  pinMode(lamp, OUTPUT);
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(2500);
-    Serial.print("Connecting...\n");
-  }
-}
+typedef struct GPIO states;
+const char epsilon = 5;
+int currentValue = 0;
+int defaultDistance = 0, newDistance = 0, count = 0;
 
 int getDistance()
 {
-  unsigned long duration;
+  int duration;
   int distance;
 
   digitalWrite(trig, LOW);
@@ -45,14 +42,44 @@ int getDistance()
 
   duration = pulseIn(echo, HIGH);
   distance = int(duration / 2 / 29.412);
-
-  // Serial.print(distance);
-  // Serial.println(" cm");
-
+  if (DEBUG)
+  {
+    Serial.print(distance);
+    Serial.println(" cm");
+  }
   return distance;
 }
 
-void loop()
+void setup()
+{
+  Serial.begin(9600);
+
+  pinMode(echo, INPUT);
+  pinMode(trig, OUTPUT);
+  pinMode(lamp, OUTPUT);
+
+  pinMode(D7, OUTPUT);
+  pinMode(D5, OUTPUT);
+  pinMode(D0, OUTPUT);
+
+  digitalWrite(D7, LOW);
+  digitalWrite(D5, LOW);
+  digitalWrite(D0, LOW);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(2500);
+    Serial.print("Connecting...\n");
+  }
+
+  defaultDistance = getDistance();
+  newDistance = 0;
+  count = 0;
+}
+
+void sendData(String distance)
 {
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -61,59 +88,60 @@ void loop()
     http.begin(mcuEndpoint);
     http.addHeader("Content-Type", "application/json");
 
-    char *testJSON = "{\"sensorData\":12}";
-    int httpCode = http.POST(testJSON);
-    String payload = http.getString();
+    String jsonPayload = "{\"A0Value\":";
+    jsonPayload += String(analogRead(A0));
+    jsonPayload += ",\"distance\":";
+    jsonPayload += String(distance);
+    jsonPayload += ",\"nodeID\":\"";
+    jsonPayload += nodeID;
+    jsonPayload += "\"";
+    jsonPayload += "}";
 
-    Serial.println(payload);
+    http.POST(jsonPayload);
+    String resPayload = http.getString();
+
+    if (DEBUG)
+    {
+      Serial.println(resPayload);
+    }
     http.end();
   }
-  delay(2000);
 }
 
-// void loop()
-// {
-//   preValue = currentValue;
-//   currentValue = getDistance();
+void loop()
+{
+  currentValue = getDistance();
 
-//   if (preValue == 0 || defaultDistance == 0 || newDistance == 0)
-//   {
-//     preValue = currentValue;
-//     defaultDistance = currentValue;
-//     newDistance = currentValue;
-//     return;
-//   }
+  int delta = defaultDistance - currentValue;
+  if (delta > epsilon)
+  {
+    if (currentValue != newDistance)
+    {
+      sendData(String(currentValue));
+      newDistance = currentValue;
+      count = 1;
+    }
+    else
+    {
+      if (currentValue == defaultDistance)
+      {
+        newDistance = 0;
+        count = 0;
+      }
+      else
+      {
+        if (count == 10)
+        {
+          defaultDistance = newDistance;
+          count = 1;
+        }
+        else
+          count++;
+      }
+    }
+  }
 
-//   int delta = currentValue - preValue;
-//   delta = abs(delta);
-//   if (delta >= epsilon && currentValue != defaultDistance)
-//   {
-//     Serial.print("Detected! | ");
-//     Serial.print(delta);
-//     Serial.print("-");
-//     Serial.print(preValue);
-//     Serial.print("-");
-//     Serial.println(currentValue);
-//   }
-
-//   if (currentValue != defaultDistance)
-//   {
-//     if (count == 10)
-//     {
-//       defaultDistance = newDistance;
-//       count = 0;
-//       Serial.print("Changed default distance to: ");
-//       Serial.println(defaultDistance);
-//     }
-
-//     if (newDistance != currentValue)
-//     {
-//       newDistance = currentValue;
-//       count = 0;
-//     }
-//     else
-//       count++;
-//   }
-//   delay(500);
-
-// }
+end:
+  Serial.println("newDistance - " + String(newDistance));
+  delay(1000);
+}
