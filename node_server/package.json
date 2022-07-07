@@ -14,7 +14,7 @@
     "express": "~4.16.0",
     "http-errors": "~1.6.2",
     "i18n": "^0.8.4",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "moment-timezone": "^0.5.27",
     "mongoose": "^5.8.9",
     "morgan": "~1.9.0",
